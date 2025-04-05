@@ -1,0 +1,20 @@
+1-Acesse : https://start.spring.io/
+
+2-Selecione:
+Project: Maven ou Gradle
+Language: Java
+Spring Boot Version: Recomendada
+Dependencies:
+Spring Web (para APIs REST)
+Spring Boot DevTools (para facilitar o desenvolvimento)
+
+3-Clique em "Generate" para baixar o projeto.
+
+4-Extraia o arquivo .zip e abra a IDE.
+
+5- Iniciar o servidor:
+5.1- Comando: mvn spring-boot:run (Maven)
+5.2- Comando: ./gradlew bootRun (Gradle)
+
+OBS --> O projeto já está configurado no Grandle, e com o Spring instalado, 
+o tutorial é apenas para caso queira começar um projeto do zero.
