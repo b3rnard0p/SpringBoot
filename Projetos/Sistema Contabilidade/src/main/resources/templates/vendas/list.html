@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Lista de Vendas - Sistema Contábil'">Lista de Vendas - Sistema Contábil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Adicionando ícones do Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link th:href="@{/Style.css}" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a th:href="@{/}" class="btn btn-outline-primary me-3" title="Voltar para Home">
+                <i class="bi bi-house-door"></i> Home
+            </a>
+        </div>
+
+        <h2 class="text-center flex-grow-1 mb-0">Vendas</h2>
+
+        <div>
+            <a th:href="@{/vendas/nova}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Nova Venda
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Valor</th>
+                <th>Pagamento</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="venda, iterStat : ${vendas}">
+                <td th:text="${iterStat.index + 1}">1</td>
+                <td th:text="${#temporals.format(venda.data(), 'dd/MM/yyyy')}">15/04/2023</td>
+                <td th:text="${venda.cliente().nome}">João Silva</td>
+                <td th:text="${venda.produtoNome()}">Pão</td>
+                <td th:text="${venda.quantidade()}">1</td>
+                <td th:text="${#numbers.formatCurrency(venda.total())}">R$ 10,00</td>
+                <td>
+                    <span th:classappend="${venda.tipoPagamento()} == 'DINHEIRO' ? 'badge-dinheiro' :
+                                        (${venda.tipoPagamento()} == 'CARTAO' ? 'badge-cartao' : 'badge-pix')"
+                          class="badge badge-pagamento text-white" th:text="${venda.tipoPagamento()}">
+                        DINHEIRO
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
