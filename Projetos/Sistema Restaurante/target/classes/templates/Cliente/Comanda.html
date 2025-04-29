@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Comanda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Sua Comanda</h1>
+    <div th:if="${comanda.itens().empty}" class="bg-white p-8 rounded-lg shadow-md text-center">
+        <i class="fas fa-receipt text-5xl text-gray-300 mb-4"></i>
+        <p class="text-xl text-gray-600">Nenhum item nesta comanda</p>
+        <a th:href="@{/cliente/list}" class="mt-4 inline-block bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">
+            Voltar ao Cardápio
+        </a>
+    </div>
+
+    <div th:unless="${comanda.itens().empty}">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Comanda</h1>
+            <p class="text-gray-500" th:text="'Mesa: ' + ${comanda.mesa()}"></p>
+            <p class="text-gray-500" th:text="'Data: ' + ${#temporals.format(comanda.dataAbertura(), 'dd/MM/yyyy HH:mm')}"></p>
+            <p class="text-gray-500" th:text="'Status: ' + ${comanda.status()}"></p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <table class="w-full">
+                <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left">Item</th>
+                    <th class="px-6 py-3 text-left">Quantidade</th>
+                    <th class="px-6 py-3 text-left">Preço Unitário</th>
+                    <th class="px-6 py-3 text-left">Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${comanda.itens()}" class="border-t">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium" th:text="${item.produtoNome()}"></h3>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4" th:text="${item.quantidade()}"></td>
+                    <td class="px-6 py-4"
+                        th:text="'R$ ' + ${#numbers.formatDecimal(item.produtoPreco(), 1, 2, 'POINT')}"></td>
+                    <td class="px-6 py-4"
+                        th:text="'R$ ' + ${#numbers.formatDecimal(item.subtotal(), 1, 2, 'POINT')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Resumo da Comanda</h2>
+            <div class="flex justify-between mb-2">
+                <span class="text-gray-600">Itens:</span>
+                <span class="text-gray-800" th:text="${comanda.itens().size()}"></span>
+            </div>
+            <div class="border-t my-3"></div>
+            <div class="flex justify-between text-lg font-bold">
+                <span>Total:</span>
+                <span class="text-red-600"
+                      th:text="'R$ ' + ${#numbers.formatDecimal(comanda.valorTotal(), 1, 2, 'POINT')}"></span>
+            </div>
+        </div>
+
+        <div class="flex justify-center space-x-4">
+            <a th:href="@{/cliente/list}"
+               class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition font-medium">
+                Voltar ao Cardápio
+            </a>
+            <div th:if="${comanda.status() == 'ABERTA'}">
+                <form th:action="@{/comanda/fechar/{id}(id=${comanda.id()})}" method="post">
+                    <button type="submit" class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition font-medium">
+                        Fechar Comanda
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

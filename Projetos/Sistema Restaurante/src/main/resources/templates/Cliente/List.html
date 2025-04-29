@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        function toggleCategoryMenu() {
+            const menu = document.getElementById('categoryMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function highlightSelectedCategory(selectedCategory) {
+            document.querySelectorAll('.categoria-btn, #todas-categorias-btn').forEach(btn => {
+                btn.classList.remove('bg-gray-200', 'font-medium');
+                btn.classList.add('text-gray-700');
+            });
+
+            if (selectedCategory === 'todas') {
+                const todasBtn = document.getElementById('todas-categorias-btn');
+                todasBtn.classList.add('bg-gray-200', 'font-medium');
+                todasBtn.classList.remove('text-gray-700');
+            } else {
+                const selectedBtn = document.querySelector(`.categoria-btn[data-category="${selectedCategory}"]`);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('bg-gray-200', 'font-medium');
+                    selectedBtn.classList.remove('text-gray-700');
+                }
+            }
+        }
+
+        function filterByCategory(category) {
+            document.querySelectorAll('.categoria-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            if (category === 'todas') {
+                document.querySelectorAll('.categoria-section').forEach(section => {
+                    section.classList.remove('hidden');
+                });
+            } else {
+                const selectedSection = document.querySelector(`.categoria-section[data-category="${category}"]`);
+                if (selectedSection) {
+                    selectedSection.classList.remove('hidden');
+                }
+            }
+
+            highlightSelectedCategory(category);
+            toggleCategoryMenu();
+        }
+    </script>
+</head>
+<body class="bg-gray-300">
+<nav class="bg-white shadow-md">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <button onclick="toggleCategoryMenu()" class="text-gray-600 hover:text-gray-900">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        <div class="flex space-x-4">
+            <a th:href="@{/carrinho}" class="flex items-center text-gray-600 hover:text-gray-900">
+                <i class="fas fa-shopping-cart mr-2"></i>
+                Carrinho
+            </a>
+            <a th:href="@{'/comanda/detalhes/' + ${#strings.replace(session.mesa, ' ', '')}}" class="flex items-center text-gray-600 hover:text-gray-900">
+                <i class="fas fa-receipt mr-2"></i>
+                Comanda
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div id="categoryMenu" class="hidden fixed inset-0 z-40">
+    <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleCategoryMenu()"></div>
+    <div class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50 overflow-y-auto">
+        <div class="p-4 border-b">
+            <h2 class="text-lg font-semibold text-gray-800">Categorias</h2>
+        </div>
+        <ul class="py-2">
+            <li>
+                <button
+                        onclick="filterByCategory('todas')"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                        id="todas-categorias-btn"
+                >
+                    Todas as categorias
+                </button>
+            </li>
+            <li th:each="categoria : ${ProdutosByStatus.disponiveis.keySet()}">
+                <button
+                        th:data-category="${categoria}"
+                        onclick="filterByCategory(this.getAttribute('data-category'))"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 categoria-btn"
+                        th:text="${categoria}"
+                >
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 py-8">
+    <div th:each="categoriaEntry : ${ProdutosByStatus.disponiveis}"
+         class="categoria-section"
+         th:attr="data-category=${categoriaEntry.key}">
+        <h3 class="text-2xl font-bold text-gray-800 mt-6 mb-4" th:text="${categoriaEntry.key}"></h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8"> <!-- Alterado para 2 colunas -->
+            <div th:each="p : ${categoriaEntry.value}"
+                 class="bg-white rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                <!-- Container da imagem com borda vermelha -->
+                <div class="border-4 border-red-600 rounded-t-lg overflow-hidden">
+                    <a th:href="@{'/produto/' + ${p.id}}" class="block">
+                        <img th:src="${p.imagemUrl}" th:alt="${p.nome}"
+                             class="w-full h-64 object-cover"/> <!-- Aumentei a altura -->
+                    </a>
+                </div>
+
+                <!-- Área do nome e preço com fundo preto -->
+                <div class="bg-black p-4 rounded-b-lg">
+                    <a th:href="@{'/produto/' + ${p.id}}" class="block">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-white" th:text="${p.nome}"></h4>
+                            <p class="text-red-500 font-bold text-xl"
+                               th:text="'R$ ' + ${#numbers.formatDecimal(p.preco, 1, 2, 'POINT')}"></p>
+                        </div>
+                        <form th:action="@{'/carrinho/adicionar/' + ${p.id}}" method="post">
+                            <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded">
+                                Adicionar ao Carrinho
+                            </button>
+                        </form>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        highlightSelectedCategory('todas');
+    });
+</script>
+<div th:if="${successMessage}" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+    <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center animate-fade-in">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button onclick="fadeOutToast(this.parentElement)" class="ml-4">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<style>
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(-20px) translateX(-50%); }
+        to { opacity: 1; transform: translateY(0) translateX(-50%); }
+    }
+    .animate-fade-in {
+        animation: fade-in 0.3s ease-out forwards;
+    }
+    .animate-fade-out {
+        animation: fade-in 0.3s ease-out reverse forwards;
+    }
+</style>
+
+<script>
+    function fadeOutToast(toast) {
+        toast.classList.remove('animate-fade-in');
+        toast.classList.add('animate-fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const toast = document.querySelector('.fixed.top-4');
+        if (toast) {
+            setTimeout(() => fadeOutToast(toast), 3000);
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Produto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Cadastro de Produto</h1>
+
+        <form th:action="@{/produto}" method="post" th:object="${produto}" class="space-y-4">
+            <!-- Campo Nome -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nome:</label>
+                <input type="text" th:field="*{nome}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500">
+            </div>
+
+            <!-- Campo Descrição -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Descrição:</label>
+                <input type="text" th:field="*{descricao}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500">
+            </div>
+
+            <!-- Campo Preço -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Preço:</label>
+                <input type="number" th:field="*{preco}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Categoria:</label>
+                <select th:field="*{categoria}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500">
+                    <option value="">Selecione uma categoria</option>
+                    <option th:each="cat : ${T(com.example.pratica2.models.Categoria).values()}"
+                            th:value="${cat}"
+                            th:text="${cat.nome}">
+                    </option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+                <select th:field="*{status}" class="form-select">
+                    <option th:each="cat : ${T(com.example.pratica2.models.Status).values()}"
+                            th:value="${cat}"
+                            th:text="${cat.status}">
+                    </option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">URL da Imagem:</label>
+                <input type="text" th:field="*{imagemUrl}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500">
+            </div>
+            <div class="pt-4">
+                <button type="submit"
+                        class="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition duration-200">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
