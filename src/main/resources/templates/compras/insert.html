@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${title} + ' - Sistema Contábil'">
+      Nova Compra - Sistema Contábil
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <style>
+      /* Remove spinner arrows from number inputs */
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <div class="flex-1">
+      <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="mb-8 flex flex-col items-center">
+          <div class="relative w-full flex justify-center">
+            <a
+              th:href="@{/compras}"
+              class="absolute left-0 inline-flex items-center text-purple-500 hover:text-purple-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </a>
+            <h1 class="text-3xl font-bold text-gray-800" th:text="${title}">
+              Nova Compra
+            </h1>
+          </div>
+        </div>
+
+        <form
+          th:action="@{/compras/salvar}"
+          th:object="${compraDTO}"
+          method="post"
+          id="compraForm"
+          novalidate
+          class="space-y-6"
+        >
+          <input
+            type="hidden"
+            id="isNovoProduto"
+            name="isNovoProduto"
+            value="true"
+          />
+
+          <!-- Seção de Fornecedor -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-black text-center">
+                Dados da Compra
+              </h3>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <select
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    id="fornecedor"
+                    th:field="*{fornecedorId}"
+                    required
+                  >
+                    <option value="">Selecione um fornecedor</option>
+                    <option
+                      th:each="fornecedor : ${fornecedores}"
+                      th:value="${fornecedor.id}"
+                      th:data-estado="${fornecedor.estado}"
+                      th:text="${fornecedor.nome} + ' (' + ${fornecedor.estado.nome} + ')'"
+                    ></option>
+                  </select>
+                  <div
+                    class="mt-1 text-sm text-red-600 hidden"
+                    id="fornecedor-error"
+                  >
+                    Selecione um fornecedor
+                  </div>
+                </div>
+                <div>
+                  <input
+                    type="date"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    id="dataCompra"
+                    th:field="*{dataCompra}"
+                    required
+                  />
+                  <div
+                    class="mt-1 text-sm text-red-600 hidden"
+                    id="dataCompra-error"
+                  >
+                    Informe a data da compra
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="mb-6 relative z-0 w-full group">
+                  <input
+                    type="number"
+                    id="quantidade"
+                    name="quantidade"
+                    min="1"
+                    required
+                    class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                    placeholder=" "
+                  />
+                  <label
+                    for="quantidade"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    Quantidade
+                  </label>
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-center"
+                    id="icms-percentual"
+                    readonly
+                    placeholder="Alíquota ICMS (%)"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="relative z-0 w-full group">
+                  <div class="flex rounded-md shadow-sm">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                      >R$</span
+                    >
+                    <input
+                      type="text"
+                      class="flex-1 min-w-0 block w-full px-3 pb-2.5 pt-4 rounded-none rounded-r-md border border-gray-300 bg-gray-100 text-sm text-gray-900 peer"
+                      id="total-display"
+                      readonly
+                      placeholder=" "
+                    />
+                    <input type="hidden" id="total" name="valorTotal" />
+                  </div>
+                  <label
+                    for="total-display"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    Total
+                  </label>
+                </div>
+                <div class="relative z-0 w-full group">
+                  <div class="flex rounded-md shadow-sm">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                      >R$</span
+                    >
+                    <input
+                      type="text"
+                      class="flex-1 min-w-0 block w-full px-3 pb-2.5 pt-4 rounded-none rounded-r-md border border-gray-300 bg-gray-100 text-sm text-gray-900 peer"
+                      id="icms-display"
+                      readonly
+                      placeholder=" "
+                    />
+                    <input type="hidden" id="valor-icms" name="valorICMS" />
+                  </div>
+                  <label
+                    for="icms-display"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    ICMS
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Pagamento -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-black text-center">
+                Pagamento
+              </h3>
+            </div>
+            <div class="p-6">
+              <div class="mb-6">
+                <div class="flex justify-center space-x-4">
+                  <div class="flex items-center">
+                    <input
+                      type="radio"
+                      id="pagamentoAvista"
+                      name="tipoPagamento"
+                      value="AVISTA"
+                      class="hidden"
+                      required
+                    />
+                    <label
+                      for="pagamentoAvista"
+                      class="flex flex-col items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 payment-option"
+                      data-value="AVISTA"
+                    >
+                      <i
+                        class="bi bi-cash-coin text-3xl text-gray-400 mb-2"
+                      ></i>
+                      <span class="text-sm font-medium text-gray-600"
+                        >À Vista</span
+                      >
+                    </label>
+                  </div>
+                  <div class="flex items-center">
+                    <input
+                      type="radio"
+                      id="pagamentoPrazo"
+                      name="tipoPagamento"
+                      value="APRAZO"
+                      class="hidden"
+                    />
+                    <label
+                      for="pagamentoPrazo"
+                      class="flex flex-col items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 payment-option"
+                      data-value="APRAZO"
+                    >
+                      <i
+                        class="bi bi-calendar2-week text-3xl text-gray-400 mb-2"
+                      ></i>
+                      <span class="text-sm font-medium text-gray-600"
+                        >A Prazo</span
+                      >
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Container das parcelas -->
+              <div
+                id="parcelasContainer"
+                class="hidden grid grid-cols-1 md:grid-cols-2 gap-6"
+              >
+                <div>
+                  <div class="flex rounded-md shadow-sm">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                      >Nº de Parcelas</span
+                    >
+                    <input
+                      type="number"
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      id="parcelas"
+                      name="parcelas"
+                      min="2"
+                      max="12"
+                      placeholder=""
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div class="relative z-0 w-full group">
+                    <div class="flex rounded-md shadow-sm">
+                      <span
+                        class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                        >R$</span
+                      >
+                      <input
+                        type="text"
+                        class="flex-1 min-w-0 block w-full px-3 pb-2.5 pt-4 rounded-none rounded-r-md border border-gray-300 bg-gray-100 text-sm text-gray-900 peer"
+                        id="valorParcela"
+                        readonly
+                        placeholder=" "
+                      />
+                    </div>
+                    <label
+                      for="valorParcela"
+                      class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                      style="pointer-events: none"
+                    >
+                      Valor da Parcela
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Escolha do Produto -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-black text-center">
+                Opções do Produto
+              </h3>
+            </div>
+            <div class="p-6">
+              <div class="flex justify-center space-x-4">
+                <div class="flex items-center">
+                  <input
+                    class="hidden"
+                    type="radio"
+                    name="produtoOption"
+                    id="novoProduto"
+                    value="novo"
+                    checked
+                  />
+                  <label
+                    for="novoProduto"
+                    class="flex flex-col items-center p-4 border-2 border-purple-600 bg-purple-100 rounded-lg cursor-pointer transition-all duration-200 produto-option"
+                    data-value="novo"
+                  >
+                    <i class="bi bi-box-seam text-3xl text-purple-600 mb-2"></i>
+                    <span class="text-sm font-medium text-purple-600"
+                      >Cadastrar novo produto</span
+                    >
+                  </label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    class="hidden"
+                    type="radio"
+                    name="produtoOption"
+                    id="atualizarProduto"
+                    value="atualizar"
+                  />
+                  <label
+                    for="atualizarProduto"
+                    class="flex flex-col items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 produto-option"
+                    data-value="atualizar"
+                  >
+                    <i
+                      class="bi bi-pencil-square text-3xl text-gray-400 mb-2"
+                    ></i>
+                    <span class="text-sm font-medium text-gray-600"
+                      >Atualizar produto existente</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Novo Produto -->
+          <div
+            class="bg-white shadow-md rounded-lg overflow-hidden"
+            id="novoProdutoSection"
+          >
+            <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-black text-center">
+                Dados do Novo Produto
+              </h3>
+            </div>
+            <div class="p-6">
+              <div class="mb-6">
+                <div class="relative z-0 w-full group">
+                  <input
+                    type="text"
+                    class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                    id="produto.nome"
+                    name="produto.nome"
+                    th:field="*{produto.nome}"
+                    placeholder=" "
+                  />
+                  <label
+                    for="produto.nome"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    Nome do Produto
+                  </label>
+                </div>
+                <div
+                  class="mt-1 text-sm text-red-600 hidden"
+                  id="produto.nome-error"
+                >
+                  Informe o nome do produto
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="relative z-0 w-full group">
+                  <input
+                    type="number"
+                    step="0.01"
+                    class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                    id="produto.precoCompra"
+                    name="produto.precoCompra"
+                    th:field="*{produto.precoCompra}"
+                    min="0.01"
+                    placeholder=" "
+                  />
+                  <label
+                    for="produto.precoCompra"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    Preço de Compra
+                  </label>
+                  <div
+                    class="mt-1 text-sm text-red-600 hidden"
+                    id="produto.precoCompra-error"
+                  >
+                    Informe o preço de compra
+                  </div>
+                </div>
+                <div class="relative z-0 w-full group">
+                  <input
+                    type="number"
+                    step="0.01"
+                    class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                    id="produto.precoVenda"
+                    name="produto.precoVenda"
+                    th:field="*{produto.precoVenda}"
+                    min="0.01"
+                    placeholder=" "
+                  />
+                  <label
+                    for="produto.precoVenda"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    Preço de Venda
+                  </label>
+                  <div
+                    class="mt-1 text-sm text-red-600 hidden"
+                    id="produto.precoVenda-error"
+                  >
+                    Informe o preço de venda
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Produto Existente -->
+          <div
+            class="bg-white shadow-md rounded-lg overflow-hidden hidden"
+            id="produtoExistenteSection"
+          >
+            <input
+              type="hidden"
+              id="produtoExistenteNomeHidden"
+              name="produto.nome"
+            />
+            <input
+              type="hidden"
+              id="produtoExistentePrecoCompraHidden"
+              name="produtoExistentePrecoCompra"
+            />
+            <input
+              type="hidden"
+              id="produtoExistentePrecoVendaHidden"
+              name="produtoExistentePrecoVenda"
+            />
+            <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-black text-center">
+                Selecionar Produto Existente
+              </h3>
+            </div>
+            <div class="p-6">
+              <div class="mb-6">
+                <select
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  id="produtoExistente"
+                  name="produtoExistenteId"
+                >
+                  <option value="">Selecione um produto</option>
+                  <option
+                    th:each="produto : ${produtos}"
+                    th:value="${produto.id}"
+                    th:data-preco-compra="${produto.precoCompra}"
+                    th:data-preco-venda="${produto.precoVenda}"
+                    th:data-nome="${produto.nome}"
+                    th:text="${produto.nome} + ' (Compra: R$' + ${#numbers.formatDecimal(produto.precoCompra, 1, 2)} + ', Venda: R$' + ${#numbers.formatDecimal(produto.precoVenda, 1, 2)} + ')'"
+                  ></option>
+                </select>
+                <div
+                  class="mt-1 text-sm text-red-600 hidden"
+                  id="produtoExistente-error"
+                >
+                  Selecione um produto
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="relative z-0 w-full group">
+                  <input
+                    type="number"
+                    step="0.01"
+                    class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                    id="produtoExistentePrecoCompra"
+                    min="0.01"
+                    placeholder=" "
+                  />
+                  <label
+                    for="produtoExistentePrecoCompra"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    Novo Preço de Compra
+                  </label>
+                  <div
+                    class="mt-1 text-sm text-red-600 hidden"
+                    id="produtoExistentePrecoCompra-error"
+                  >
+                    Informe o preço de compra
+                  </div>
+                </div>
+                <div class="relative z-0 w-full group">
+                  <input
+                    type="number"
+                    step="0.01"
+                    class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                    id="produtoExistentePrecoVenda"
+                    min="0.01"
+                    placeholder=" "
+                  />
+                  <label
+                    for="produtoExistentePrecoVenda"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    Novo Preço de Venda
+                  </label>
+                  <div
+                    class="mt-1 text-sm text-red-600 hidden"
+                    id="produtoExistentePrecoVenda-error"
+                  >
+                    Informe o preço de venda
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botões -->
+          <div class="flex justify-center space-x-4">
+            <a
+              th:href="@{/compras}"
+              class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-2"
+            >
+              Cancelar
+            </a>
+            <button
+              type="submit"
+              class="px-6 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-purple-600 hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-2"
+            >
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.js"></script>
+    <script>
+      $(document).ready(function () {
+        const form = document.getElementById("compraForm");
+        const fornecedorSelect = document.getElementById("fornecedor");
+
+        // Disable scroll wheel on number inputs
+        $('input[type="number"]').on("wheel", function (e) {
+          e.preventDefault();
+        });
+
+        // Objeto com as alíquotas por estado
+        const aliquotasPorEstado = {
+          AC: 17.0,
+          AL: 18.0,
+          AM: 18.0,
+          AP: 18.0,
+          BA: 18.0,
+          CE: 18.0,
+          DF: 18.0,
+          ES: 17.0,
+          GO: 17.0,
+          MA: 18.0,
+          MG: 18.0,
+          MS: 17.0,
+          MT: 17.0,
+          PA: 17.0,
+          PB: 18.0,
+          PE: 18.0,
+          PI: 18.0,
+          PR: 18.0,
+          RJ: 20.0,
+          RN: 18.0,
+          RO: 17.5,
+          RR: 17.0,
+          RS: 18.0,
+          SC: 17.0,
+          SE: 18.0,
+          SP: 18.0,
+          TO: 17.0,
+        };
+
+        // --- NOVO: Opções de Produto com ícones ---
+        const produtoOptions = document.querySelectorAll(".produto-option");
+        produtoOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            // Remove seleção anterior
+            produtoOptions.forEach((opt) => {
+              opt.classList.remove("border-purple-600", "bg-purple-100");
+              opt.classList.add("border-gray-300");
+              const icon = opt.querySelector("i");
+              const text = opt.querySelector("span");
+              icon.classList.remove("text-purple-600");
+              icon.classList.add("text-gray-400");
+              text.classList.remove("text-purple-600");
+              text.classList.add("text-gray-600");
+            });
+            // Adiciona seleção atual
+            this.classList.remove("border-gray-300");
+            this.classList.add("border-purple-600", "bg-purple-100");
+            const icon = this.querySelector("i");
+            const text = this.querySelector("span");
+            icon.classList.remove("text-gray-400");
+            icon.classList.add("text-purple-600");
+            text.classList.remove("text-gray-600");
+            text.classList.add("text-purple-600");
+            // Marca o radio
+            const radio = document.getElementById(this.getAttribute("for"));
+            radio.checked = true;
+            // Dispara o evento change para alternar as seções
+            $(radio).trigger("change");
+          });
+        });
+
+        // Alternar entre novo produto e produto existente
+        $('input[name="produtoOption"]').change(function () {
+          const isNovoProduto = $(this).val() === "novo";
+          $("#isNovoProduto").val(isNovoProduto);
+
+          if (isNovoProduto) {
+            $("#novoProdutoSection").removeClass("hidden");
+            $("#produtoExistenteSection").addClass("hidden");
+
+            $(
+              "#produtoExistente, #produtoExistentePrecoCompra, #produtoExistentePrecoVenda"
+            )
+              .prop("required", false)
+              .removeClass("border-red-500");
+
+            $(
+              "#produto\\.nome, #produto\\.precoCompra, #produto\\.precoVenda"
+            ).prop("required", true);
+
+            // Limpar os campos de preço de compra e venda ao cadastrar novo produto
+            $("#produto\\.precoCompra").val("");
+            $("#produto\\.precoVenda").val("");
+          } else {
+            $("#novoProdutoSection").addClass("hidden");
+            $("#produtoExistenteSection").removeClass("hidden");
+
+            $("#produto\\.nome, #produto\\.precoCompra, #produto\\.precoVenda")
+              .prop("required", false)
+              .removeClass("border-red-500");
+
+            $(
+              "#produtoExistente, #produtoExistentePrecoCompra, #produtoExistentePrecoVenda"
+            ).prop("required", true);
+          }
+
+          calcularTotal();
+        });
+
+        // Preencher automaticamente os campos quando selecionar um produto existente
+        $("#produtoExistente").change(function () {
+          const selectedOption = $(this).find("option:selected");
+          if (selectedOption.val()) {
+            const precoCompra = selectedOption.data("preco-compra");
+            const precoVenda = selectedOption.data("preco-venda");
+            const nomeProduto = selectedOption.data("nome");
+
+            // Preencher automaticamente os campos quando produto existente é selecionado
+            $("#produtoExistentePrecoCompra").val(precoCompra);
+            $("#produtoExistentePrecoVenda").val(precoVenda);
+            $("#produtoExistenteNomeHidden").val(nomeProduto);
+
+            $("#produtoExistentePrecoCompraHidden").val(precoCompra);
+            $("#produtoExistentePrecoVendaHidden").val(precoVenda);
+
+            $(this).removeClass("border-red-500");
+            $(`#${this.id}-error`).addClass("hidden");
+          }
+          calcularTotal();
+        });
+
+        // Atualiza os campos hidden quando os preços são editados
+        $("#produtoExistentePrecoCompra, #produtoExistentePrecoVenda").on(
+          "input",
+          function () {
+            $("#produtoExistentePrecoCompraHidden").val(
+              $("#produtoExistentePrecoCompra").val()
+            );
+            $("#produtoExistentePrecoVendaHidden").val(
+              $("#produtoExistentePrecoVenda").val()
+            );
+            calcularTotal();
+          }
+        );
+
+        // Validação antes do submit
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // Atualiza os campos hidden com os valores atuais
+          if (!$("#novoProduto").is(":checked")) {
+            $("#produtoExistentePrecoCompraHidden").val(
+              $("#produtoExistentePrecoCompra").val()
+            );
+            $("#produtoExistentePrecoVendaHidden").val(
+              $("#produtoExistentePrecoVenda").val()
+            );
+          }
+
+          let isValid = true;
+          const isNovoProduto =
+            $('input[name="produtoOption"]:checked').val() === "novo";
+
+          // Validar campos comuns
+          $("#fornecedor, #dataCompra, #quantidade").each(function () {
+            if (!this.value) {
+              $(this).addClass("border-red-500");
+              $(`#${this.id}-error`).removeClass("hidden");
+              isValid = false;
+            } else {
+              $(this).removeClass("border-red-500");
+              $(`#${this.id}-error`).addClass("hidden");
+            }
+          });
+
+          // Validar seção de produto
+          if (isNovoProduto) {
+            $(
+              "#produto\\.nome, #produto\\.precoCompra, #produto\\.precoVenda"
+            ).each(function () {
+              if (!this.value) {
+                $(this).addClass("border-red-500");
+                $(`#${this.id}-error`).removeClass("hidden");
+                isValid = false;
+              } else {
+                $(this).removeClass("border-red-500");
+                $(`#${this.id}-error`).addClass("hidden");
+              }
+            });
+          } else {
+            $(
+              "#produtoExistente, #produtoExistentePrecoCompra, #produtoExistentePrecoVenda"
+            ).each(function () {
+              if (!this.value) {
+                $(this).addClass("border-red-500");
+                $(`#${this.id}-error`).removeClass("hidden");
+                isValid = false;
+              } else {
+                $(this).removeClass("border-red-500");
+                $(`#${this.id}-error`).addClass("hidden");
+              }
+            });
+          }
+
+          if (isValid) {
+            form.submit();
+          } else {
+            $("html, body").animate(
+              {
+                scrollTop: $(".border-red-500").first().offset().top - 100,
+              },
+              500
+            );
+          }
+        });
+
+        function getAliquotaFornecedor() {
+          const selectedOption =
+            fornecedorSelect.options[fornecedorSelect.selectedIndex];
+          if (selectedOption && selectedOption.value) {
+            const estado = selectedOption.getAttribute("data-estado");
+            return aliquotasPorEstado[estado] || 17.0;
+          }
+          return null;
+        }
+
+        // Inicialização: limpar campos calculados e de preço para mostrar placeholders
+        $("#icms-percentual").val("");
+        $("#total-display").val("");
+        $("#total").val("");
+        $("#icms-display").val("");
+        $("#valor-icms").val("");
+        $("#produto\\.precoCompra").val("");
+        $("#produto\\.precoVenda").val("");
+
+        // Dispara o cálculo inicial
+        calcularTotal();
+
+        function calcularTotal() {
+          const isNovoProduto =
+            $('input[name="produtoOption"]:checked').val() === "novo";
+          let preco;
+
+          if (isNovoProduto) {
+            preco = parseFloat($("#produto\\.precoCompra").val());
+          } else {
+            const precoEditado = parseFloat(
+              $("#produtoExistentePrecoCompra").val()
+            );
+            const precoOriginal = parseFloat(
+              $("#produtoExistente")
+                .find("option:selected")
+                .data("preco-compra")
+            );
+            preco = isNaN(precoEditado) ? precoOriginal : precoEditado;
+          }
+
+          const quantidade = parseFloat($("#quantidade").val());
+          const fornecedorSelecionado = $("#fornecedor").val();
+          const aliquota = getAliquotaFornecedor();
+          const icmsPercentual = aliquota / 100;
+          const valorBase =
+            preco > 0 && quantidade > 0 ? preco * quantidade : null;
+          const valorICMS =
+            valorBase !== null ? valorBase * icmsPercentual : null;
+          const totalComICMS =
+            valorBase !== null && valorICMS !== null
+              ? valorBase + valorICMS
+              : null;
+
+          // Só mostrar a alíquota se um fornecedor estiver selecionado
+          if (fornecedorSelecionado) {
+            $("#icms-percentual").val(aliquota ? aliquota.toFixed(2) : "");
+          } else {
+            $("#icms-percentual").val("");
+          }
+
+          // Só preenche os outros campos se houver valores válidos
+          if (preco > 0 && quantidade > 0) {
+            $("#icms-percentual").val(aliquota ? aliquota.toFixed(2) : "");
+            $("#total-display").val(totalComICMS.toFixed(2));
+            $("#total").val(valorBase.toFixed(2));
+            $("#icms-display").val(valorICMS.toFixed(2));
+            $("#valor-icms").val(valorICMS.toFixed(2));
+            // CHAME calcularParcela se pagamento a prazo estiver selecionado
+            if ($("#pagamentoPrazo").is(":checked")) {
+              calcularParcela();
+            }
+          } else {
+            $("#total-display").val("");
+            $("#total").val("");
+            $("#icms-display").val("");
+            $("#valor-icms").val("");
+          }
+        }
+
+        // --- NOVO: Pagamento com ícones ---
+        const paymentOptions = document.querySelectorAll(".payment-option");
+        const parcelasContainer = document.getElementById("parcelasContainer");
+        const parcelasInput = document.getElementById("parcelas");
+        const valorParcelaInput = document.getElementById("valorParcela");
+        paymentOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            // Remove seleção anterior
+            paymentOptions.forEach((opt) => {
+              opt.classList.remove("border-purple-600", "bg-purple-100");
+              opt.classList.add("border-gray-300");
+              const icon = opt.querySelector("i");
+              const text = opt.querySelector("span");
+              icon.classList.remove("text-purple-600");
+              icon.classList.add("text-gray-400");
+              text.classList.remove("text-purple-600");
+              text.classList.add("text-gray-600");
+            });
+            // Adiciona seleção atual
+            this.classList.remove("border-gray-300");
+            this.classList.add("border-purple-600", "bg-purple-100");
+            const icon = this.querySelector("i");
+            const text = this.querySelector("span");
+            icon.classList.remove("text-gray-400");
+            icon.classList.add("text-purple-600");
+            text.classList.remove("text-gray-600");
+            text.classList.add("text-purple-600");
+            // Marca o radio
+            const radio = document.getElementById(this.getAttribute("for"));
+            radio.checked = true;
+            // Mostra/oculta parcelas
+            const selectedValue = this.dataset.value;
+            if (selectedValue === "APRAZO") {
+              parcelasContainer.classList.remove("hidden");
+              parcelasInput.value = "2";
+              calcularParcela();
+            } else {
+              parcelasContainer.classList.add("hidden");
+              valorParcelaInput.value = "";
+              valorParcelaInput.placeholder = "Valor da Parcela";
+            }
+          });
+        });
+
+        // Gerenciamento de parcelas
+        const totalInput = document.getElementById("total");
+
+        parcelasInput.addEventListener("input", calcularParcela);
+
+        function calcularParcela() {
+          if (totalInput.value && parcelasInput.value) {
+            const total = parseFloat(totalInput.value);
+            const parcelas = parseInt(parcelasInput.value);
+            const valorParcela = total / parcelas;
+
+            valorParcelaInput.value = valorParcela.toFixed(2).replace(".", ",");
+          }
+        }
+
+        // Atualiza o cálculo quando qualquer campo relevante mudar
+        $(
+          "#produto\\.precoCompra, #produtoExistentePrecoCompra, #quantidade, #fornecedor"
+        ).on("input change", calcularTotal);
+      });
+    </script>
+  </body>
+</html>

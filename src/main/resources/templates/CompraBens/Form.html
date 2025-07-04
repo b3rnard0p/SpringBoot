@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Nova Compra de Bem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <style>
+      /* Remove spinner arrows from number inputs */
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+      <div class="mb-8 flex flex-col items-center">
+        <div class="relative w-full flex justify-center">
+          <a
+            th:href="@{/compra-bens/list}"
+            class="absolute left-0 inline-flex items-center text-purple-500 hover:text-purple-700"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+          <h1 class="text-3xl font-bold text-gray-800">Nova Compra de Bem</h1>
+        </div>
+      </div>
+
+      <form
+        th:action="@{/compra-bens/save}"
+        th:object="${compra}"
+        method="post"
+        id="compraBemForm"
+        class="space-y-6"
+      >
+        <input type="hidden" th:field="*{novoBem}" value="false" />
+
+        <!-- Seção de escolha do Bem -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+          <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-black text-center">
+              Tipo de Bem
+            </h3>
+          </div>
+          <div class="p-6">
+            <div class="flex justify-center space-x-4">
+              <div class="flex items-center">
+                <input
+                  class="hidden"
+                  type="radio"
+                  id="optNovo"
+                  th:field="*{novoBem}"
+                  th:value="true"
+                  checked
+                />
+                <label
+                  for="optNovo"
+                  class="flex flex-col items-center p-4 border-2 border-purple-600 bg-purple-100 rounded-lg cursor-pointer transition-all duration-200 bem-option"
+                  data-value="novo"
+                >
+                  <i class="bi bi-box-seam text-3xl text-purple-600 mb-2"></i>
+                  <span class="text-sm font-medium text-purple-600"
+                    >Novo Bem</span
+                  >
+                </label>
+              </div>
+              <div class="flex items-center">
+                <input
+                  class="hidden"
+                  type="radio"
+                  id="optExistente"
+                  th:field="*{novoBem}"
+                  th:value="false"
+                />
+                <label
+                  for="optExistente"
+                  class="flex flex-col items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 bem-option"
+                  data-value="existente"
+                >
+                  <i
+                    class="bi bi-pencil-square text-3xl text-gray-400 mb-2"
+                  ></i>
+                  <span class="text-sm font-medium text-gray-600"
+                    >Bem Existente</span
+                  >
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção Novo Bem -->
+        <div
+          id="novoBemSection"
+          class="bg-white shadow-md rounded-lg overflow-hidden"
+        >
+          <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+            <h3 class="text-lg text-center font-medium text-black">
+              Dados do Novo Bem
+            </h3>
+          </div>
+          <div class="p-6">
+            <div class="mb-6 relative z-0 w-full group">
+              <input
+                type="text"
+                th:field="*{bem.nome}"
+                id="bemNome"
+                required
+                class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                placeholder=" "
+              />
+              <label
+                for="bemNome"
+                class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                style="pointer-events: none"
+              >
+                Nome do Bem
+              </label>
+            </div>
+            <div class="mb-6 relative z-0 w-full group">
+              <input
+                type="number"
+                step="0.01"
+                th:field="*{bem.preco}"
+                id="precoUnitario"
+                required
+                class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                placeholder=" "
+              />
+              <label
+                for="precoUnitario"
+                class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                style="pointer-events: none"
+              >
+                Preço Unitário
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção Bem Existente -->
+        <div
+          id="existenteBemSection"
+          class="bg-white shadow-md rounded-lg overflow-hidden hidden"
+        >
+          <!-- Hidden para capturar nome/preço via JS -->
+          <input type="hidden" id="bemNomeHidden" th:field="*{bem.nome}" />
+          <input
+            type="hidden"
+            name="bemExistentePreco"
+            id="bemPrecoHidden"
+            th:field="*{bemExistentePreco}"
+          />
+
+          <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+            <h3 class="text-lg text-center font-medium text-black">
+              Selecionar Bem Existente
+            </h3>
+          </div>
+          <div class="p-6">
+            <div class="mb-6">
+              <select
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                id="selectBem"
+                th:field="*{bemExistenteId}"
+                placeholder="Selecione Bem Existente"
+              >
+                <option value="">Selecione Bem Existente</option>
+                <option
+                  th:each="b : ${bens}"
+                  th:value="${b.id}"
+                  th:data-nome="${b.nome}"
+                  th:data-preco="${b.preco}"
+                  th:text="${b.nome} + ' (R$ ' + ${#numbers.formatDecimal(b.preco,1,2)} + ')'"
+                ></option>
+              </select>
+            </div>
+            <div class="mb-6 relative z-0 w-full group">
+              <input
+                type="number"
+                step="0.01"
+                th:field="*{bemExistentePreco}"
+                id="inputBemPrecoOverride"
+                class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                placeholder=" "
+              />
+              <label
+                for="inputBemPrecoOverride"
+                class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                style="pointer-events: none"
+              >
+                Novo Preço (opcional)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demais campos de compra -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+          <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+            <h3 class="text-lg text-center font-medium text-gray-900">
+              Dados da Compra
+            </h3>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <input
+                  type="date"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  th:field="*{dataCompra}"
+                  placeholder="Data da Compra"
+                />
+              </div>
+              <div class="relative z-0 w-full group">
+                <input
+                  type="number"
+                  th:field="*{quantidade}"
+                  id="quantidade"
+                  required
+                  class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                  placeholder=" "
+                />
+                <label
+                  for="quantidade"
+                  class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                  style="pointer-events: none"
+                >
+                  Quantidade
+                </label>
+                <input
+                  type="hidden"
+                  th:field="*{bem.quantidade}"
+                  th:value="*{quantidade}"
+                />
+              </div>
+            </div>
+            <div class="relative z-0 w-full group">
+              <input
+                type="number"
+                step="0.01"
+                th:field="*{valorTotal}"
+                id="valorTotal"
+                required
+                class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                placeholder=" "
+              />
+              <label
+                for="valorTotal"
+                class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                style="pointer-events: none"
+              >
+                Valor Total
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Pagamento -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+          <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-black text-center">
+              Pagamento
+            </h3>
+          </div>
+          <div class="p-6">
+            <div class="mb-6">
+              <div class="flex justify-center space-x-4">
+                <div class="flex items-center">
+                  <input
+                    type="radio"
+                    id="pagamentoAvista"
+                    name="tipoPagamento"
+                    value="AVISTA"
+                    class="hidden"
+                    required
+                  />
+                  <label
+                    for="pagamentoAvista"
+                    class="flex flex-col items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 payment-option"
+                    data-value="AVISTA"
+                  >
+                    <i class="bi bi-cash-coin text-3xl text-gray-400 mb-2"></i>
+                    <span class="text-sm font-medium text-gray-600"
+                      >À Vista</span
+                    >
+                  </label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="radio"
+                    id="pagamentoPrazo"
+                    name="tipoPagamento"
+                    value="APRAZO"
+                    class="hidden"
+                  />
+                  <label
+                    for="pagamentoPrazo"
+                    class="flex flex-col items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 payment-option"
+                    data-value="APRAZO"
+                  >
+                    <i
+                      class="bi bi-calendar2-week text-3xl text-gray-400 mb-2"
+                    ></i>
+                    <span class="text-sm font-medium text-gray-600"
+                      >A Prazo</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+            <!-- Container das parcelas -->
+            <div
+              id="parcelasContainer"
+              class="hidden grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              <div>
+                <div class="flex rounded-md shadow-sm">
+                  <span
+                    class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >Nº de Parcelas</span
+                  >
+                  <input
+                    type="number"
+                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    id="parcelas"
+                    name="parcelas"
+                    min="2"
+                    max="12"
+                    placeholder=""
+                  />
+                </div>
+              </div>
+              <div>
+                <div class="flex rounded-md shadow-sm">
+                  <span
+                    class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >R$</span
+                  >
+                  <input
+                    type="text"
+                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 bg-gray-100"
+                    id="valorParcela"
+                    readonly
+                    placeholder="Valor da Parcela"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="flex justify-center space-x-4">
+          <a
+            th:href="@{/compra-bens/list}"
+            class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Cancelar
+          </a>
+          <button
+            type="submit"
+            class="px-6 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-purple-600 hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Toggle entre novo bem e bem existente
+        const optNovo = document.getElementById("optNovo");
+        const optExistente = document.getElementById("optExistente");
+        const secNovo = document.getElementById("novoBemSection");
+        const secExist = document.getElementById("existenteBemSection");
+        const selectBem = document.getElementById("selectBem");
+        const hiddenNome = document.getElementById("bemNomeHidden");
+        const hiddenPreco = document.getElementById("bemPrecoHidden");
+        const overridePreco = document.getElementById("inputBemPrecoOverride");
+
+        // Elementos para cálculo de valores
+        const precoUnitario = document.getElementById("precoUnitario");
+        const quantidade = document.getElementById("quantidade");
+        const valorTotal = document.getElementById("valorTotal");
+
+        // Elementos para parcelamento
+        const paymentOptions = document.querySelectorAll(".payment-option");
+        const parcelasContainer = document.getElementById("parcelasContainer");
+        const parcelasInput = document.getElementById("parcelas");
+        const valorParcelaInput = document.getElementById("valorParcela");
+
+        function toggleSections() {
+          if (optNovo.checked) {
+            secNovo.classList.remove("hidden");
+            secExist.classList.add("hidden");
+            hiddenNome.value = "";
+            hiddenPreco.value = "";
+          } else {
+            secNovo.classList.add("hidden");
+            secExist.classList.remove("hidden");
+            updateHiddenFromSelect();
+          }
+        }
+
+        function updateHiddenFromSelect() {
+          const opt = selectBem.options[selectBem.selectedIndex];
+          hiddenNome.value = opt.dataset.nome ? opt.dataset.nome.trim() : "";
+          hiddenPreco.value = overridePreco.value || opt.dataset.preco || "";
+
+          // Atualiza o preço unitário e recalcula o total
+          if (opt.dataset.preco) {
+            precoUnitario.value = opt.dataset.preco;
+            calcularTotal();
+          }
+        }
+
+        function calcularTotal() {
+          if (precoUnitario.value && quantidade.value) {
+            const total =
+              parseFloat(precoUnitario.value) * parseInt(quantidade.value);
+            valorTotal.value = total.toFixed(2);
+
+            // Se for a prazo, recalcula as parcelas
+            if (paymentOptions[1].checked) {
+              calcularParcela();
+            }
+          }
+        }
+
+        function calcularParcela() {
+          if (valorTotal.value && parcelasInput.value) {
+            const total = parseFloat(valorTotal.value);
+            const parcelas = parseInt(parcelasInput.value);
+            const valorParcela = total / parcelas;
+            valorParcelaInput.value = valorParcela.toFixed(2).replace(".", ",");
+          }
+        }
+
+        // Listeners
+        optNovo.addEventListener("change", toggleSections);
+        optExistente.addEventListener("change", toggleSections);
+        selectBem.addEventListener("change", updateHiddenFromSelect);
+        overridePreco.addEventListener("input", updateHiddenFromSelect);
+        precoUnitario.addEventListener("input", calcularTotal);
+        quantidade.addEventListener("input", calcularTotal);
+
+        // Listeners para parcelamento
+        paymentOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            // Remove seleção anterior
+            paymentOptions.forEach((opt) => {
+              opt.classList.remove("border-purple-600", "bg-purple-100");
+              opt.classList.add("border-gray-300");
+              const icon = opt.querySelector("i");
+              const text = opt.querySelector("span");
+              icon.classList.remove("text-purple-600");
+              icon.classList.add("text-gray-400");
+              text.classList.remove("text-purple-600");
+              text.classList.add("text-gray-600");
+            });
+            // Adiciona seleção atual
+            this.classList.remove("border-gray-300");
+            this.classList.add("border-purple-600", "bg-purple-100");
+            const icon = this.querySelector("i");
+            const text = this.querySelector("span");
+            icon.classList.remove("text-gray-400");
+            icon.classList.add("text-purple-600");
+            text.classList.remove("text-gray-600");
+            text.classList.add("text-purple-600");
+            // Marca o radio
+            const radio = document.getElementById(this.getAttribute("for"));
+            radio.checked = true;
+            // Mostra/oculta parcelas
+            const selectedValue = this.dataset.value;
+            if (selectedValue === "APRAZO") {
+              parcelasContainer.classList.remove("hidden");
+              parcelasInput.value = "2";
+              calcularParcela();
+            } else {
+              parcelasContainer.classList.add("hidden");
+              valorParcelaInput.value = "";
+              valorParcelaInput.placeholder = "Valor da Parcela";
+            }
+          });
+        });
+
+        // Atualiza valor da parcela quando muda número de parcelas
+        parcelasInput.addEventListener("input", calcularParcela);
+
+        // Inicialização
+        toggleSections();
+
+        // Remove scroll wheel dos inputs type=number
+        document.querySelectorAll('input[type="number"]').forEach((input) => {
+          input.addEventListener("wheel", function (e) {
+            e.preventDefault();
+          });
+        });
+
+        // --- NOVO: Opções de Bem com ícones ---
+        const bemOptions = document.querySelectorAll(".bem-option");
+        bemOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            // Remove seleção anterior
+            bemOptions.forEach((opt) => {
+              opt.classList.remove("border-purple-600", "bg-purple-100");
+              opt.classList.add("border-gray-300");
+              const icon = opt.querySelector("i");
+              const text = opt.querySelector("span");
+              icon.classList.remove("text-purple-600");
+              icon.classList.add("text-gray-400");
+              text.classList.remove("text-purple-600");
+              text.classList.add("text-gray-600");
+            });
+            // Adiciona seleção atual
+            this.classList.remove("border-gray-300");
+            this.classList.add("border-purple-600", "bg-purple-100");
+            const icon = this.querySelector("i");
+            const text = this.querySelector("span");
+            icon.classList.remove("text-gray-400");
+            icon.classList.add("text-purple-600");
+            text.classList.remove("text-gray-600");
+            text.classList.add("text-purple-600");
+            // Marca o radio
+            const radio = document.getElementById(this.getAttribute("for"));
+            radio.checked = true;
+            // Dispara o evento change para alternar as seções
+            radio.dispatchEvent(new Event("change"));
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

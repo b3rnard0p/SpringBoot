@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema Contábil - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+    />
+    <style>
+      /* Remove spinner arrows from number inputs */
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-b from-purple-700 from-0 via-purple-600 via-[8rem] via-purple-400 via-[10rem] to-white to-[25rem] min-h-screen flex flex-col"
+  >
+    <header class="bg-transparent py-6 mb-6">
+      <div class="container mx-auto px-4">
+        <!-- Nome da Empresa -->
+        <div class="text-center mb-6">
+          <h1 class="text-3xl font-bold text-white" th:text="${empresa.nome}">
+            Nome da Empresa
+          </h1>
+          <p class="text-white mt-1">Sistema Contábil Integrado</p>
+        </div>
+
+        <!-- Contas Compactas -->
+        <div class="max-w-7xl mx-auto">
+          <div
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2"
+          >
+            <!-- Credito ICMS -->
+            <div
+              class="bg-white rounded-lg p-2 shadow hover:shadow-md transition-shadow border-l-4 border-green-500"
+            >
+              <div class="flex flex-col items-center text-center">
+                <i
+                  class="bi bi-piggy-bank-fill text-lg text-green-600 mb-1"
+                ></i>
+                <div class="w-full">
+                  <div class="text-xs font-medium text-gray-500 truncate">
+                    Credito ICMS
+                  </div>
+                  <div
+                    class="text-sm font-bold text-gray-800 truncate"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(saldoICMS, 1, 2, 'POINT')}"
+                  >
+                    R$ 0,00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Debito ICMS -->
+            <div
+              class="bg-white rounded-lg p-2 shadow hover:shadow-md transition-shadow border-l-4 border-red-500 cursor-pointer hover:bg-red-50"
+              onclick="abrirModalICMS()"
+              title="Clique para pagar o débito de ICMS"
+            >
+              <div class="flex flex-col items-center text-center">
+                <i
+                  class="bi bi-exclamation-triangle-fill text-lg text-red-600 mb-1"
+                ></i>
+                <div class="w-full">
+                  <div class="text-xs font-medium text-gray-500 truncate">
+                    Debito ICMS
+                  </div>
+                  <div
+                    class="text-sm font-bold text-gray-800 truncate"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(debitoICMS, 1, 2, 'POINT')}"
+                  >
+                    R$ 0,00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Despesas -->
+            <div
+              class="bg-white rounded-lg p-2 shadow hover:shadow-md transition-shadow border-l-4 border-red-500"
+            >
+              <div class="flex flex-col items-center text-center">
+                <i class="bi bi-cash-coin text-lg text-red-600 mb-1"></i>
+                <div class="w-full">
+                  <div class="text-xs font-medium text-gray-500 truncate">
+                    Despesas
+                  </div>
+                  <div
+                    class="text-sm font-bold text-gray-800 truncate"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(totalDespesas, 1, 2, 'POINT')}"
+                  >
+                    R$ 0,00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Capital Social -->
+            <div
+              class="bg-white rounded-lg p-2 shadow hover:shadow-md transition-shadow border-l-4 border-green-500"
+            >
+              <div class="flex flex-col items-center text-center">
+                <i class="bi bi-cash-coin text-lg text-green-600 mb-1"></i>
+                <div class="w-full">
+                  <div class="text-xs font-medium text-gray-500 truncate">
+                    Capital Social
+                  </div>
+                  <div
+                    class="text-sm font-bold text-gray-800 truncate"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(capitalSocial, 1, 2, 'POINT')}"
+                  >
+                    R$ 0,00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Saldo Caixa -->
+            <div
+              class="bg-white rounded-lg p-2 shadow hover:shadow-md transition-shadow border-l-4 border-green-500"
+            >
+              <div class="flex flex-col items-center text-center">
+                <i class="bi bi-cash-coin text-lg text-green-600 mb-1"></i>
+                <div class="w-full">
+                  <div class="text-xs font-medium text-gray-500 truncate">
+                    Saldo Caixa
+                  </div>
+                  <div
+                    class="text-sm font-bold text-gray-800 truncate"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(saldoCaixa, 1, 2, 'POINT')}"
+                  >
+                    R$ 0,00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Patrimônio -->
+            <div
+              class="bg-white rounded-lg p-2 shadow hover:shadow-md transition-shadow border-l-4 border-green-500"
+            >
+              <div class="flex flex-col items-center text-center">
+                <i class="bi bi-cash-coin text-lg text-green-600 mb-1"></i>
+                <div class="w-full">
+                  <div class="text-xs font-medium text-gray-500 truncate">
+                    Patrimônio
+                  </div>
+                  <div
+                    class="text-sm font-bold text-gray-800 truncate"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(saldoPatrimonio, 1, 2, 'POINT')}"
+                  >
+                    R$ 0,00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- A Receber -->
+            <div
+              class="bg-white rounded-lg p-2 shadow hover:shadow-md transition-shadow border-l-4 border-green-500"
+            >
+              <div class="flex flex-col items-center text-center">
+                <i
+                  class="bi bi-arrow-down-circle-fill text-lg text-emerald-600 mb-1"
+                ></i>
+                <div class="w-full">
+                  <div class="text-xs font-medium text-gray-500 truncate">
+                    A Receber
+                  </div>
+                  <div
+                    class="text-sm font-bold text-gray-800 truncate"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(totalParcelasAReceber, 1, 2, 'POINT')}"
+                  >
+                    R$ 0,00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- A Pagar -->
+            <div
+              class="bg-white rounded-lg p-2 shadow hover:shadow-md transition-shadow border-l-4 border-red-500"
+            >
+              <div class="flex flex-col items-center text-center">
+                <i
+                  class="bi bi-arrow-up-circle-fill text-lg text-rose-600 mb-1"
+                ></i>
+                <div class="w-full">
+                  <div class="text-xs font-medium text-gray-500 truncate">
+                    A Pagar
+                  </div>
+                  <div
+                    class="text-sm font-bold text-gray-800 truncate"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(totalParcelasAPagar, 1, 2, 'POINT')}"
+                  >
+                    R$ 0,00
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <!-- Produtos -->
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-box-seam text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Produtos</h3>
+            <p class="text-gray-600 mb-4">Gerencie seu catálogo de produtos</p>
+            <a
+              th:href="@{/produtos}"
+              class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              Acessar <i class="bi bi-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Clientes -->
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-people text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Clientes</h3>
+            <p class="text-gray-600 mb-4">Gerencie sua base de clientes</p>
+            <a
+              th:href="@{/clientes}"
+              class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              Acessar <i class="bi bi-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Fornecedores -->
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-truck text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Fornecedores</h3>
+            <p class="text-gray-600 mb-4">Gerencie seus fornecedores</p>
+            <a
+              th:href="@{/fornecedores}"
+              class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              Acessar <i class="bi bi-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <!-- Bens -->
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-door-closed text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Bens</h3>
+            <p class="text-gray-600 mb-4">Gerencie seus Bens</p>
+            <a
+              th:href="@{/bens}"
+              class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              Acessar <i class="bi bi-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Balanço Patrimonial -->
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-graph-up text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Balanço Patrimonial</h3>
+            <p class="text-gray-600 mb-4">Relatório de contas</p>
+            <a
+              th:href="@{/relatorios/balanco-patrimonial}"
+              class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              Acessar <i class="bi bi-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-cash-stack text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Despesas</h3>
+            <p class="text-gray-600 mb-4">Registre suas despesas</p>
+            <a
+              th:href="@{/despesa/list}"
+              class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              Acessar <i class="bi bi-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Vendas -->
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-cash-stack text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Vendas</h3>
+            <p class="text-gray-600 mb-4">Registre e consulte vendas</p>
+            <div class="grid grid-cols-1 gap-2">
+              <a
+                th:href="@{/vendas}"
+                class="inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Listar Vendas <i class="bi bi-list ml-2"></i>
+              </a>
+              <a
+                th:href="@{/vendas/nova}"
+                class="inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Nova Venda <i class="bi bi-plus-circle ml-2"></i>
+              </a>
+              <a
+                th:href="@{/vendas/contas-a-receber}"
+                class="inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Parcelas a Receber <i class="bi bi-calendar2-week ml-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compras -->
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-cart-check text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Compras</h3>
+            <p class="text-gray-600 mb-4">Registre e consulte compras</p>
+            <div class="grid grid-cols-1 gap-2">
+              <a
+                th:href="@{/compras}"
+                class="inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Listar Compras <i class="bi bi-list ml-2"></i>
+              </a>
+              <a
+                th:href="@{/compras/novo}"
+                class="inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Nova Compra <i class="bi bi-plus-circle ml-2"></i>
+              </a>
+              <a
+                th:href="@{/compras/contas-a-pagar}"
+                class="inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Compras a Pagar <i class="bi bi-clock-history ml-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compra de Bens -->
+        <div
+          class="bg-purple-100 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
+        >
+          <div class="p-6 text-center">
+            <i class="bi bi-cart-plus text-5xl text-purple-600 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Compra de Bens</h3>
+            <p class="text-gray-600 mb-4">Registre aquisições de patrimônio</p>
+            <div class="grid grid-cols-1 gap-2">
+              <a
+                th:href="@{/compra-bens/list}"
+                class="inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Listar Compras <i class="bi bi-list ml-2"></i>
+              </a>
+              <a
+                th:href="@{/compra-bens/form}"
+                class="inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Nova Compra <i class="bi bi-plus-circle ml-2"></i>
+              </a>
+              <a
+                th:href="@{/compra-bens/contas-a-pagar-bens}"
+                class="inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+              >
+                Compras a Pagar <i class="bi bi-clock-history ml-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para cadastro de empresa -->
+    <div
+      th:if="${not empresaCadastrada}"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+          <h3 class="text-lg text-center font-medium text-gray-900">
+            Cadastro Inicial
+          </h3>
+        </div>
+        <div class="p-6">
+          <form
+            th:action="@{/cadastrar-empresa}"
+            th:object="${empresa}"
+            method="post"
+            class="space-y-4"
+          >
+            <div>
+              <label
+                for="nome"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Nome da Empresa</label
+              >
+              <input
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                id="nome"
+                th:field="*{nome}"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="capitalSocial"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Capital Social Inicial</label
+              >
+              <div class="flex rounded-md shadow-sm">
+                <span
+                  class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                  >R$</span
+                >
+                <input
+                  type="number"
+                  step="0.01"
+                  class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  id="capitalSocial"
+                  th:field="*{capitalSocial}"
+                  required
+                />
+              </div>
+            </div>
+            <div class="pt-4 border-t flex justify-center space-x-3">
+              <button
+                type="submit"
+                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div
+      id="modalPagarICMS"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+          <h3 class="text-lg text-center font-medium text-gray-900">
+            Pagamento de Débito ICMS
+          </h3>
+        </div>
+        <div class="p-6">
+          <form th:action="@{/icms/pagar}" method="post" class="space-y-4">
+            <div>
+              <p
+                class="text-2xl font-bold text-red-600 mb-4 text-center"
+                th:text="${'R$ ' + #numbers.formatDecimal(debitoICMS, 1, 2, 'POINT')}"
+              ></p>
+            </div>
+            <div class="relative z-0 w-full mb-6 group">
+              <input
+                type="number"
+                name="valor"
+                id="valor"
+                step="0.01"
+                min="0.01"
+                max="9999999"
+                required
+                class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                placeholder=" "
+              />
+              <label
+                for="valor"
+                class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                style="pointer-events: none"
+              >
+                Valor a pagar
+              </label>
+            </div>
+            <div class="pt-4 border-t flex justify-center space-x-3">
+              <button
+                type="button"
+                onclick="fecharModalICMS()"
+                class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-black bg-white hover:bg-gray-200"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-purple-600 hover:bg-purple-700"
+              >
+                Pagar
+              </button>
+            </div>
+          </form>
+          <div th:if="${valorPago != null}" class="mt-4">
+            <p class="text-green-700 font-semibold">
+              Pagamento realizado:
+              <span
+                th:text="${'R$ ' + #numbers.formatDecimal(valorPago, 1, 2, 'POINT')}"
+              ></span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script th:if="${not empresaCadastrada}">
+      // Impede que o modal seja fechado clicando fora dele
+      document
+        .querySelector(".fixed.inset-0")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+    </script>
+    <script>
+      function abrirModalICMS() {
+        document.getElementById("modalPagarICMS").classList.remove("hidden");
+      }
+      function fecharModalICMS() {
+        document.getElementById("modalPagarICMS").classList.add("hidden");
+      }
+      // Impede scroll de alterar valor do input number do modal ICMS
+      document.addEventListener("DOMContentLoaded", function () {
+        var input = document.querySelector(
+          '#modalPagarICMS input[type="number"]'
+        );
+        if (input) {
+          input.addEventListener("wheel", function (e) {
+            e.preventDefault();
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Vendas - Sistema Contábil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <div class="flex-1">
+        <div class="container mx-auto px-4 py-8 max-w-7xl">
+            <!-- Header Section -->
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex items-center">
+                    <a th:href="@{/}" class="flex items-center px-4 py-2 border border-purple-500 text-black rounded-md hover:bg-purple-700 hover:text-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform">
+                        <i class="bi bi-house-door mr-2"></i> Home
+                    </a>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 text-center flex-grow">Vendas</h2>
+                <div>
+                    <a th:href="@{/vendas/nova}" class="flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform">
+                        <i class="bi bi-plus-circle mr-2"></i> Nova Venda
+                    </a>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-purple-600">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Data</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Cliente</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Produto</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Quantidade</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Valor</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Pagamento</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="venda, iterStat : ${vendas}" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${#temporals.format(venda.data(), 'dd/MM/yyyy')}">15/04/2023</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${venda.cliente().nome}">João Silva</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${venda.produtoNome()}">Pão</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${venda.quantidade()}">1</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${#numbers.formatCurrency(venda.total())}">R$ 10,00</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${venda.tipoPagamento()}">1</td>
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

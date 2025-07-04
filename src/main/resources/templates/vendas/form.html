@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nova Venda - Sistema Contábil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <style>
+      /* Remove spinner arrows from number inputs */
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      /* Prevent scroll wheel from changing number input values */
+      input[type="number"]:focus {
+        outline: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <div class="flex-1">
+      <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="mb-8 flex flex-col items-center">
+          <div class="relative w-full flex justify-center">
+            <a
+              th:href="@{/vendas}"
+              class="absolute left-0 inline-flex items-center text-purple-500 hover:text-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </a>
+            <h1 class="text-3xl font-bold text-gray-800">Nova Venda</h1>
+          </div>
+        </div>
+
+        <form th:action="@{/vendas/salvar}" method="post" class="space-y-6">
+          <!-- Seção de Cliente e Produto -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+              <h3 class="text-lg text-center font-medium text-black">
+                Dados da Venda
+              </h3>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <select
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    id="clienteId"
+                    name="clienteId"
+                    required
+                  >
+                    <option value="">Selecione um cliente</option>
+                    <option
+                      th:each="cliente : ${clientes}"
+                      th:value="${cliente.id}"
+                      th:text="${cliente.nome} + ' - ' + ${cliente.cpf}"
+                    ></option>
+                  </select>
+                </div>
+                <div>
+                  <select
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    id="produtoId"
+                    name="produtoId"
+                    required
+                  >
+                    <option value="">Selecione um produto</option>
+                    <option
+                      th:each="produto : ${produtos}"
+                      th:value="${produto.id}"
+                      th:text="${produto.nome} + ' - R$ ' + ${#numbers.formatDecimal(produto.precoVenda, 1, 2, 'POINT')}"
+                    ></option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Valores -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+              <h3 class="text-lg text-center font-medium text-black">
+                Valores
+              </h3>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="relative z-0 w-full group">
+                  <input
+                    type="number"
+                    id="quantidade"
+                    name="quantidade"
+                    min="1"
+                    required
+                    class="block px-3 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-0 focus:border-purple-600 peer"
+                    placeholder=" "
+                  />
+                  <label
+                    for="quantidade"
+                    class="absolute text-base font-medium text-purple-600 duration-300 transform -translate-y-3 scale-90 top-2 left-3 z-10 bg-white px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:font-normal peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-4 peer-focus:scale-90 peer-focus:text-purple-600 peer-focus:font-medium peer-focus:-translate-y-3 peer-focus:top-0.5"
+                    style="pointer-events: none"
+                  >
+                    Quantidade
+                  </label>
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100"
+                    id="precoUnitario"
+                    placeholder="Preço Unitário"
+                    readonly
+                  />
+                </div>
+                <div>
+                  <div class="flex rounded-md shadow-sm">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                      >R$</span
+                    >
+                    <input
+                      type="text"
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 bg-gray-100"
+                      id="total-display"
+                      placeholder="Total"
+                      readonly
+                    />
+                    <input type="hidden" id="total" name="total" value="0.00" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Pagamento -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-purple-100 border-b border-gray-200">
+              <h3 class="text-lg text-center font-medium text-black">
+                Pagamento
+              </h3>
+            </div>
+            <div class="p-6">
+              <div class="mb-6">
+                <div class="flex justify-center space-x-4">
+                  <div class="flex items-center">
+                    <input
+                      type="radio"
+                      id="pagamentoAvista"
+                      name="tipoPagamento"
+                      value="AVISTA"
+                      class="hidden"
+                      required
+                    />
+                    <label
+                      for="pagamentoAvista"
+                      class="flex flex-col items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 payment-option"
+                      data-value="AVISTA"
+                    >
+                      <i
+                        class="bi bi-cash-coin text-3xl text-gray-400 mb-2"
+                      ></i>
+                      <span class="text-sm font-medium text-gray-600"
+                        >À Vista</span
+                      >
+                    </label>
+                  </div>
+                  <div class="flex items-center">
+                    <input
+                      type="radio"
+                      id="pagamentoPrazo"
+                      name="tipoPagamento"
+                      value="APRAZO"
+                      class="hidden"
+                    />
+                    <label
+                      for="pagamentoPrazo"
+                      class="flex flex-col items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 payment-option"
+                      data-value="APRAZO"
+                    >
+                      <i
+                        class="bi bi-calendar2-week text-3xl text-gray-400 mb-2"
+                      ></i>
+                      <span class="text-sm font-medium text-gray-600"
+                        >A Prazo</span
+                      >
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Container das parcelas -->
+              <div id="parcelasContainer" class="hidden flex space-x-4">
+                <div class="flex-1">
+                  <div class="flex rounded-md shadow-sm">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                      >Nº de Parcelas</span
+                    >
+                    <input
+                      type="number"
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      id="parcelas"
+                      name="parcelas"
+                      min="2"
+                      max="12"
+                    />
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <div class="flex rounded-md shadow-sm">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                      >R$</span
+                    >
+                    <input
+                      type="text"
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 bg-gray-100"
+                      id="valorParcela"
+                      placeholder="Valor da Parcela"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botões -->
+          <div class="flex justify-center space-x-4">
+            <a
+              th:href="@{/vendas}"
+              class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancelar
+            </a>
+            <button
+              type="submit"
+              class="px-6 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-purple-600 hover:bg-purple-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Registrar Venda
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const produtoSelect = document.getElementById("produtoId");
+        const quantidadeInput = document.getElementById("quantidade");
+        const precoUnitarioInput = document.getElementById("precoUnitario");
+        const totalDisplay = document.getElementById("total-display");
+        const totalInput = document.getElementById("total");
+        const parcelasContainer = document.getElementById("parcelasContainer");
+        const parcelasInput = document.getElementById("parcelas");
+        const valorParcelaInput = document.getElementById("valorParcela");
+
+        // Gerenciar seleção dos ícones de pagamento
+        const paymentOptions = document.querySelectorAll(".payment-option");
+        paymentOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            // Remove seleção anterior
+            paymentOptions.forEach((opt) => {
+              opt.classList.remove("border-purple-600", "bg-purple-100");
+              opt.classList.add("border-gray-300");
+              const icon = opt.querySelector("i");
+              const text = opt.querySelector("span");
+              icon.classList.remove("text-purple-600");
+              icon.classList.add("text-gray-400");
+              text.classList.remove("text-purple-600");
+              text.classList.add("text-gray-600");
+            });
+
+            // Adiciona seleção atual
+            this.classList.remove("border-gray-300");
+            this.classList.add("border-purple-600", "bg-purple-100");
+            const icon = this.querySelector("i");
+            const text = this.querySelector("span");
+            icon.classList.remove("text-gray-400");
+            icon.classList.add("text-purple-600");
+            text.classList.remove("text-gray-600");
+            text.classList.add("text-purple-600");
+
+            // Mostra/oculta campo de parcelas
+            const selectedValue = this.dataset.value;
+            if (selectedValue === "APRAZO") {
+              parcelasContainer.style.display = "flex";
+              parcelasInput.value = "2";
+              calcularParcela();
+            } else {
+              parcelasContainer.style.display = "none";
+              valorParcelaInput.value = "";
+              valorParcelaInput.placeholder = "Valor da Parcela";
+            }
+          });
+        });
+
+        // Atualiza preço unitário quando seleciona produto
+        produtoSelect.addEventListener("change", function () {
+          const selectedOption = this.options[this.selectedIndex];
+          if (selectedOption.value) {
+            const precoText = selectedOption.text.split(" - R$ ")[1];
+            precoUnitarioInput.value = precoText;
+            calcularTotal();
+          } else {
+            precoUnitarioInput.value = "";
+            totalDisplay.value = "";
+            totalInput.value = "0.00";
+          }
+        });
+
+        // Atualiza total quando muda quantidade
+        quantidadeInput.addEventListener("input", calcularTotal);
+
+        // Atualiza valor da parcela quando muda número de parcelas ou total
+        parcelasInput.addEventListener("input", calcularParcela);
+
+        // Prevenir scroll wheel de mudar valores dos inputs numéricos
+        const numberInputs = document.querySelectorAll('input[type="number"]');
+        numberInputs.forEach((input) => {
+          input.addEventListener("wheel", function (e) {
+            e.preventDefault();
+          });
+        });
+
+        function calcularTotal() {
+          if (precoUnitarioInput.value && quantidadeInput.value) {
+            const preco = parseFloat(
+              precoUnitarioInput.value.replace(",", ".")
+            );
+            const quantidade = parseInt(quantidadeInput.value);
+            const total = preco * quantidade;
+
+            totalDisplay.value = total.toFixed(2).replace(".", ",");
+            totalInput.value = total.toFixed(2);
+
+            // Verifica se o pagamento a prazo está selecionado
+            const pagamentoPrazo = document.getElementById("pagamentoPrazo");
+            if (pagamentoPrazo.checked) {
+              calcularParcela();
+            }
+          }
+        }
+
+        function calcularParcela() {
+          if (
+            totalInput.value &&
+            parcelasInput.value &&
+            totalInput.value !== "0.00"
+          ) {
+            const total = parseFloat(totalInput.value);
+            const parcelas = parseInt(parcelasInput.value);
+            const valorParcela = total / parcelas;
+
+            valorParcelaInput.value = valorParcela.toFixed(2).replace(".", ",");
+          } else {
+            valorParcelaInput.value = "";
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
