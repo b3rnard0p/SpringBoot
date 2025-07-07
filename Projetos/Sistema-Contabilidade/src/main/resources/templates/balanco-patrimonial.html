@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Balanço Patrimonial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col">
+    <div class="flex-1">
+      <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-3 items-center mb-4">
+          <div>
+            <a
+              th:href="@{/}"
+              class="inline-flex items-center border border-purple-500 hover:bg-purple-700 text-black font-medium py-2 px-4 rounded hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              <i class="bi bi-house-door-fill mr-2"></i> Home
+            </a>
+          </div>
+          <div class="text-center">
+            <h2 th:text="${title}" class="text-2xl font-semibold">
+              Balanço Patrimonial
+            </h2>
+          </div>
+          <div class="text-right">
+            <a
+              th:href="@{/api/balanco-patrimonial/pdf}"
+              class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform"
+            >
+              <i class="bi bi-file-pdf mr-2"></i> Exportar PDF
+            </a>
+          </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-6 mb-6">
+          <!-- ATIVO -->
+          <div class="flex-1">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden h-full">
+              <div class="bg-green-600 px-4 py-3">
+                <h2 class="text-xl font-semibold text-white">ATIVO</h2>
+              </div>
+              <div class="p-4">
+                <table class="w-full">
+                  <tbody>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">Caixa</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(balanco.get('ATIVO').get('Caixa'), 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">Contas a Receber</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(balanco.get('ATIVO').get('Contas a Receber'), 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">ICMS a Recuperar</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(balanco.get('ATIVO').get('ICMS a Recuperar'), 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">Bens Patrimoniais</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(balanco.get('ATIVO').get('Bens Patrimoniais'), 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="bg-green-100 font-bold">
+                      <td class="py-2">TOTAL DO ATIVO</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(totalAtivo, 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- PASSIVO -->
+          <div class="flex-1">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden h-full">
+              <div class="bg-red-600 px-4 py-3">
+                <h2 class="text-xl font-semibold text-white">PASSIVO</h2>
+              </div>
+              <div class="p-4">
+                <table class="w-full">
+                  <tbody>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">Contas a Pagar</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(balanco.get('PASSIVO').get('Contas a Pagar'), 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">Despesas</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(balanco.get('PASSIVO').get('Despesas'), 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">ICMS a Recolher</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(balanco.get('PASSIVO').get('ICMS a Recolher'), 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="bg-red-100 font-bold">
+                      <td class="py-2">TOTAL DO PASSIVO</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(totalPassivo, 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PATRIMÔNIO LÍQUIDO (centralizado) -->
+        <div class="flex justify-center">
+          <div class="w-full lg:w-1/2">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+              <div class="bg-purple-600 px-4 py-3">
+                <h2 class="text-xl font-semibold text-white">
+                  PATRIMÔNIO LÍQUIDO
+                </h2>
+              </div>
+              <div class="p-4">
+                <table class="w-full">
+                  <tbody>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">Capital Social</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(
+                balanco.get('PATRIMÔNIO LÍQUIDO').get('Capital Social'),
+                1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                    <tr class="border-b">
+                      <td class="py-2 font-medium">Resultado do Exercício</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(
+                balanco.get('PATRIMÔNIO LÍQUIDO').get('Resultado do Exercício'),
+                1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="bg-purple-100 font-bold">
+                      <td class="py-2">TOTAL DO PATRIMÔNIO LÍQUIDO</td>
+                      <td class="py-2 text-right">
+                        R$
+                        <span
+                          th:text="${#numbers.formatDecimal(totalPatrimonio, 1, 2, 'POINT')}"
+                        ></span>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 text-center">
+          <p class="text-gray-600 mb-4">
+            Data do relatório:
+            <span
+              class="font-medium"
+              th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}"
+            ></span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div th:replace="fragments/footer :: footer"></div>
+  </body>
+</html>
